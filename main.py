@@ -28,6 +28,26 @@ def descargar_video():
     except Exception as e:
         etiqueta_estado.config(text=f"Error: {e}")
 
+def descargar_audio():
+    url = entrada_url.get()
+    if not url:
+        etiqueta_estado.config(text="Por favor, ingresa una URL")
+        return
+    if not directorio_destino:
+        etiqueta_estado.config(text="Por favor, selecciona un directorio")
+        return
+
+    try:
+        yt = YouTube(url)
+        audio = yt.streams.filter(only_audio=True).first()
+        descarga_audio = audio.download(directorio_destino)
+        base, _ = os.path.splitext(descarga_audio)  # Ignoramos la extensión en esta variable
+        nuevo_archivo = base + '.mp3'
+        os.rename(descarga_audio, nuevo_archivo)
+        etiqueta_estado.config(text="¡Descarga de audio completa!")
+    except Exception as e:
+        etiqueta_estado.config(text=f"Error: {e}")
+
 root = tk.Tk()
 root.title("Descargador de Videos de Kuroky")
 
@@ -43,8 +63,11 @@ boton_seleccionar_directorio.pack()
 etiqueta_directorio = tk.Label(root, text="No se ha seleccionado ningún directorio")
 etiqueta_directorio.pack()
 
-boton_descargar = tk.Button(root, text="Descargar", command=descargar_video)
+boton_descargar = tk.Button(root, text="Descargar Video", command=descargar_video)
 boton_descargar.pack()
+
+boton_descargar_audio = tk.Button(root, text="Descargar Audio", command=descargar_audio)
+boton_descargar_audio.pack()
 
 etiqueta_estado = tk.Label(root, text="")
 etiqueta_estado.pack()
